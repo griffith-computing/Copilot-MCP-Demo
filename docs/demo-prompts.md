@@ -134,12 +134,16 @@ interactive or autopilot execution. Treat approval of either execution option
 as authorization for all and only the mutations listed in the plan.
 
 After plan approval, implement only this item and run all required checks. If
-any required check fails or remains unverified, stop before commit and all
-external writes. Otherwise stage only scoped files, commit with the planned
-AB# subject, push without force, create and read back the GitHub PR, re-read
-the item, post/read back the planned factual comment, and perform/read back
-the planned revision-safe state transition. Never merge or delete the branch.
-If any material plan detail changes, update the plan and request native plan
+routine repository/package/toolchain dependencies are missing, resolve them
+automatically with the repository's existing package manager and conventions;
+do not return them to me as a checklist or ask me to choose routine versions.
+Do not silently implement a separate unmet Azure DevOps prerequisite work item.
+If any required check still fails or remains unverified, stop before commit and
+all external writes. Otherwise stage only scoped files, commit with the planned
+AB# subject, push without force, create and read back the GitHub PR, re-read the
+item, post/read back the planned factual comment, and perform/read back the
+planned revision-safe state transition. Never merge or delete the branch. If
+any material plan detail changes, update the plan and request native plan
 approval again. Report partial failures and duplicate-safe resume instructions
 precisely.
 ```
