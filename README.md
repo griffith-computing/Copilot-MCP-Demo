@@ -1,6 +1,6 @@
 # GitHub Copilot → Azure DevOps → working calculator
 
-A presenter-ready demo kit: turn requirements into Azure DevOps Boards work items, then use those work items as the bounded specification for GitHub Copilot implementation.
+A presenter-ready demo kit: turn requirements into Azure DevOps Boards work items, then use those work items as the bounded specification for a .NET 10 calculator implementation with GitHub Copilot.
 
 **This kit authors instructions, not a running app.** No Azure DevOps account was connected, no work items were created, and no application was implemented or tested while preparing it. The three real repository agent skills live in their own `SKILL.md` files. They require tools exposed by your Copilot client; a skill does not install tools or grant permissions.
 
@@ -34,18 +34,18 @@ A presenter-ready demo kit: turn requirements into Azure DevOps Boards work item
     └── skill-report.html
 ```
 
-Application files such as `package.json`, `src/`, and tests are created later by Copilot during the demo, not supplied by this kit. Copy the repository skills into this exact layout; do not flatten or rename any `SKILL.md`.
+Application files such as the solution, SDK-style projects, C# source, Razor components, and tests are created later by Copilot during the demo, not supplied by this kit. Copy the repository skills into this exact layout; do not flatten or rename any `SKILL.md`.
 
 ## Chosen demo defaults
 
 These are choices for a compact demo, **not facts about your organization**:
 
 - VS Code + GitHub Copilot Agent mode; Azure DevOps Boards for planning; local Git checkout for coding.
-- New app: React + TypeScript + Vite, with Vitest and React Testing Library. Prefer existing repository language, package manager, and test conventions if there is already an app.
+- New app: .NET 10 standalone Blazor WebAssembly, with a pure C# engine, xUnit, and bUnit. Prefer existing repository language, SDK, NuGet, and test conventions if there is already an app.
 - V1: simple calculator. V2: scientific extension of the same engine and UI, with V1 regressions preserved.
 - Two version Feature parents and six implementable stories: three for each version. Tasks are optional, not extra backlog noise.
 - No backend, authentication, database, paid service, or cloud deployment.
-- Stable demo key: `copilot-calculator-demo`. Keep this key on repeat runs; choose another key deliberately for an independent demo.
+- Stable demo key: `copilot-calculator-dotnet-demo`. Keep this key on repeat runs; choose another key deliberately for an independent demo.
 
 ## Architecture to explain aloud
 
@@ -76,7 +76,7 @@ The Azure DevOps MCP server supplies work-item context and Boards actions. Copil
 - [ ] Start the configured MCP server in VS Code and complete authentication through the client. Do not put tokens, passwords, client secrets, or credentials in the config, repository, prompts, or work items.
 - [ ] Check actual exposed tool names and schemas, project process, work-item types, fields, link relations, and allowed state transitions using the preflight prompt. Have a prepared project selected before the live demo.
 - [ ] Permit read tools during preflight. Approve creation/link tools only when running the explicit create prompt. Preview-only prompts never authorize writes.
-- [ ] Node.js and your repository's package manager are ready for the later app build; React/Vite setup and package installation happen only during implementation with your consent. The kit itself installed nothing.
+- [ ] The .NET 10 SDK is installed and `dotnet --info` reports a usable SDK. Blazor project setup and NuGet restore happen only during implementation with your consent. The calculator build does not require Node.js. The kit itself installed nothing.
 - [ ] Rehearse authentication, item creation, and test commands before presenting. Network, permission, generated-code, and package-install latency are not predictable.
 
 ### Remote MCP: primary configuration
@@ -100,7 +100,7 @@ The sample uses the remote HTTP endpoint and the `wit` toolset:
 
 ### Local MCP: documented fallback, not a second simultaneous server
 
-If you need the supported local path, replace the remote config with this alternative. Local prerequisites include **Node.js 20+**. This command uses the current unpinned package; review the package/version your demo actually uses. Do not select an old version merely to preserve obsolete tool names.
+If you need the supported local MCP path, replace the remote config with this alternative. Unlike the calculator application, this fallback MCP process still requires **Node.js 20+** because Microsoft distributes it through npm. Use the remote HTTP MCP configuration above when Node.js is unavailable. This command uses the current unpinned package; review the package/version your demo actually uses. Do not select an old version merely to preserve obsolete tool names.
 
 ```json
 {
@@ -165,7 +165,7 @@ For a reliably short talk, implement just one story live and explain that the re
 ## Definition of done for the demo application
 
 - Selected acceptance criteria have implementation and test coverage, with requirement IDs visible in test names or a test map.
-- Engine tests, UI tests, type checks, lint (if configured), and production build have actually run, or are explicitly reported as not run with reasons.
+- Engine tests, bUnit component tests, configured formatting checks, and `dotnet build` have actually run, or are explicitly reported as not run with reasons.
 - Keyboard behavior and accessibility checks include manual inspection; automated tests alone are not a blanket accessibility guarantee.
 - V2 changes preserve the V1 suite. Unselected work items remain out of scope.
 - With `ado-implement-work-item`, the reviewed diff remains local: no automatic commit, push, pull request, Azure DevOps state change, or completion claim.

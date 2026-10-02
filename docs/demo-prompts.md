@@ -7,7 +7,7 @@ Use these in **VS Code GitHub Copilot Chat, Agent mode**, with the repository ro
 - Replace `<ADO_ORGANIZATION>` and `<ADO_PROJECT>` with your actual context.
 - Replace `<WORK_ITEM_ID>` with an actual server-returned numeric story/task ID. For batches, fill the named version IDs from `docs/work-item-map.json` after creation. **Do not paste unresolved placeholders as if they were work items.**
 - `<V1_ENGINE_ID>`, `<V1_UI_ID>`, `<V1_QUALITY_ID>`, `<V2_ALGEBRA_ID>`, `<V2_TRIG_ID>`, and `<V2_FUNCTIONS_ID>` stand for actual numeric IDs, not requirement identifiers or made-up demo IDs.
-- Keep `copilot-calculator-demo` unchanged for repeat runs. To make a separate independent backlog, deliberately choose another demo key and a separate map; do not casually change the key while rehearsing.
+- Keep `copilot-calculator-dotnet-demo` unchanged for repeat runs. To make a separate independent backlog, deliberately choose another demo key and a separate map; do not casually change the key while rehearsing.
 - The quoted skill names make intent explicit, but verify your client actually loads the skill. The agent must use live tool descriptions/schemas, not assume historical tool names.
 - Read-only previews forbid **all** writes, including local map changes. A client tool approval is not, by itself, a request to create items.
 
@@ -18,7 +18,7 @@ Use the ado-create-work-items skill for a read-only preflight of this demo.
 Organization: <ADO_ORGANIZATION>
 Project: <ADO_PROJECT>
 Version to inspect: V1
-Demo key: copilot-calculator-demo
+Demo key: copilot-calculator-dotnet-demo
 
 List the actual connected Azure DevOps MCP tool names, actions, and relevant
 input schemas/capabilities. List accessible projects and verify the exact
@@ -39,7 +39,7 @@ Do not create, edit, link, comment, transition, or write any local files.
 Use ado-create-work-items to preview V1 from docs/calculator-requirements.md.
 Organization: <ADO_ORGANIZATION>
 Project: <ADO_PROJECT>
-Demo key: copilot-calculator-demo
+Demo key: copilot-calculator-dotnet-demo
 
 Plan CALC-V1 as the supported version parent and the three V1 stories:
 CALC-V1-ENGINE, CALC-V1-UI, and CALC-V1-QUALITY. Include requirement and
@@ -59,7 +59,7 @@ Preview only: no Azure DevOps writes and no local map/file writes. Stop at the p
 ```text
 Use ado-create-work-items. I explicitly request creation of the reviewed V1
 backlog in organization <ADO_ORGANIZATION>, project <ADO_PROJECT>, with demo
-key copilot-calculator-demo, from docs/calculator-requirements.md.
+key copilot-calculator-dotnet-demo, from docs/calculator-requirements.md.
 
 Recheck current metadata and existing identity matches. Show the final bounded
 plan, then execute its create/reuse and missing approved hierarchy/dependency
@@ -88,10 +88,12 @@ Read the exact item, acceptance criteria, comments, current revision, parent,
 and necessary dependencies through the actual MCP read tools. Verify project
 and identity. Inspect this checkout, its conventions, and git status; preserve
 unrelated/dirty changes. Summarize the bounded criteria and implement only this
-selected story. For a fresh repo, use the chosen React/TypeScript/Vite defaults,
-with a pure engine and Vitest/React Testing Library where relevant; explain
-needed dependency/setup changes and respect client approvals. Use no eval or
-new Function. Add tests named/mapped to criterion IDs and run available checks.
+selected story. For a fresh repo, use the chosen .NET 10 standalone Blazor
+WebAssembly defaults, with a pure C# engine, xUnit, and bUnit where relevant;
+explain needed project/NuGet changes and respect client approvals. Do not
+compile, interpret, or execute expressions as code. Add tests named/mapped to
+criterion IDs and run available `dotnet` checks. Do not introduce a Node.js or
+JavaScript package-manager dependency.
 Report actual passed/failed/not-run commands, diff, coverage, and gaps.
 Do not implement unselected stories, change Azure DevOps state or comments,
 commit, push, deploy, or open a PR.
@@ -135,7 +137,7 @@ as authorization for all and only the mutations listed in the plan.
 
 After plan approval, implement only this item and run all required checks. If
 routine repository/package/toolchain dependencies are missing, resolve them
-automatically with the repository's existing package manager and conventions;
+automatically with the repository's existing .NET/NuGet conventions;
 do not return them to me as a checklist or ask me to choose routine versions.
 Do not silently implement a separate unmet Azure DevOps prerequisite work item.
 If any required check still fails or remains unverified, stop before commit and
@@ -181,7 +183,7 @@ Project: <ADO_PROJECT>
 Actual IDs: <V1_ENGINE_ID>, <V1_UI_ID>, <V1_QUALITY_ID>.
 
 Read their current acceptance criteria through MCP and inspect the local code.
-Run existing relevant engine/UI tests, configured type/lint checks, and build.
+Run existing relevant engine/component tests, configured formatting checks, and build.
 Compare coverage against all V1 criteria in docs/calculator-requirements.md.
 Report command, observed status, evidence, and uncovered criteria. Separately
 report whether keyboard, focus/labels, contrast/target sizes, and 320/768/1280
@@ -200,7 +202,7 @@ First preview:
 Use ado-create-work-items to preview V2 from docs/calculator-requirements.md.
 Organization: <ADO_ORGANIZATION>
 Project: <ADO_PROJECT>
-Demo key: copilot-calculator-demo
+Demo key: copilot-calculator-dotnet-demo
 
 Plan only CALC-V2 and CALC-V2-ALGEBRA/TRIG/FUNCTIONS. Query existing V1 and V2
 identities and read the actual V1 prerequisites. Keep V1 untouched; V2 extends
@@ -214,7 +216,7 @@ Then explicitly create:
 ```text
 Use ado-create-work-items. I explicitly request creation of the reviewed V2
 backlog in organization <ADO_ORGANIZATION>, project <ADO_PROJECT>, with demo
-key copilot-calculator-demo, from docs/calculator-requirements.md.
+key copilot-calculator-dotnet-demo, from docs/calculator-requirements.md.
 
 Recheck identities/metadata and show the final plan. Execute only CALC-V2 and
 CALC-V2-ALGEBRA/TRIG/FUNCTIONS plus approved missing links, subject to my client
@@ -254,8 +256,8 @@ Use ado-implement-work-item for validation only in organization
 V1 IDs: <V1_ENGINE_ID>, <V1_UI_ID>, <V1_QUALITY_ID>.
 V2 IDs: <V2_ALGEBRA_ID>, <V2_TRIG_ID>, <V2_FUNCTIONS_ID>.
 
-Read current criteria via MCP and run the full available V1/V2 tests, typecheck,
-lint if configured, and build. Check requirement coverage, not only examples.
+Read current criteria via MCP and run the full available V1/V2 tests, configured
+formatting check if any, and `dotnet build`. Check requirement coverage, not only examples.
 Examples to confirm include 2+3*4=14, (2+3)*4=20, sqrt(9)=3, DEG sin(30)=0.5,
 RAD sin(pi/2)=1, log10(100)=2, ln(e)=1, 5!=120, and tan(90) in DEG as a domain
 error. Apply the specified floating tolerance and exact error/display checks.
@@ -311,7 +313,7 @@ or deployment. Do not assume a state named Done exists.
 Use ado-create-work-items to rerun the V1 backlog creation safely.
 Organization: <ADO_ORGANIZATION>
 Project: <ADO_PROJECT>
-Demo key: copilot-calculator-demo
+Demo key: copilot-calculator-dotnet-demo
 Source: docs/calculator-requirements.md
 
 I explicitly authorize only missing V1 creates and approved missing links from

@@ -30,7 +30,7 @@ User: “Preview an Azure DevOps backlog for V1 from docs/calculator-requirement
 
 ### 1. Resolve scope and discover actual tools
 
-Read the requirements from the current repository, the requested version, the stable demo key (default `copilot-calculator-demo`), and [docs/work-item-map.json](../../../docs/work-item-map.json) if it exists. Require the actual organization and project; placeholders such as `<ADO_PROJECT>` are not executable identifiers. Reject a map bound to another organization/project/demo key unless the user deliberately selects a separate map/key.
+Read the requirements from the current repository, the requested version, the stable demo key (default `copilot-calculator-dotnet-demo`), and [docs/work-item-map.json](../../../docs/work-item-map.json) if it exists. Require the actual organization and project; placeholders such as `<ADO_PROJECT>` are not executable identifiers. Reject a map bound to another organization/project/demo key unless the user deliberately selects a separate map/key.
 
 Use the client's exposed MCP tool list/descriptions and input schemas, not remembered prefixes or copied payloads. Discover capabilities for project listing, work-item type/field/state metadata, querying, item reads, creation, and hierarchy links. Microsoft documents consolidated local examples `wit_work_item` (`get`, `get_batch`, `list_comments`, `get_type`), `wit_query` (`wiql`, `get`, `get_results`), `wit_work_item_write` (`create`, `update`, `update_batch`, `add_child`), and `wit_work_item_link_write` (`link`). Project examples differ: local `mcp_ado_core_list_projects`, remote `core_list_projects`. These names/actions are **examples only**; call only an actually exposed tool using its actual schema. Do not invent field parameters or raw REST fallback.
 
@@ -64,14 +64,14 @@ organization + project + demoKey + primary requirement ID + kind
 Put a human-readable identity marker in the supported description:
 
 ```text
-DemoKey: copilot-calculator-demo
+DemoKey: copilot-calculator-dotnet-demo
 RequirementId: CALC-V1-ENGINE
 Kind: story
 Version: V1
 Source: docs/calculator-requirements.md
 ```
 
-If tags are supported, also use stable tags such as `demo:copilot-calculator-demo`, `req:CALC-V1-ENGINE`, `kind:story`, `version:V1`. Verify how the actual tool/field accepts tags. A similar title alone is never enough to identify a duplicate.
+If tags are supported, also use stable tags such as `demo:copilot-calculator-dotnet-demo`, `req:CALC-V1-ENGINE`, `kind:story`, `version:V1`. Verify how the actual tool/field accepts tags. A similar title alone is never enough to identify a duplicate.
 
 Query existing items in the exact project using supported query facilities and schema, page all results, then read candidates to verify the full identity. Reconcile candidate IDs with the map; the server is authoritative. Querying only the local map is not sufficient, since a prior create may have succeeded before map persistence. If the capability cannot reliably find existing identities, require trustworthy user-supplied existing-item evidence covering the scope, or block creation. No “create and hope” fallback.
 

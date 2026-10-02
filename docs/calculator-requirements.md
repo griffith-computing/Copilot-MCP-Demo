@@ -1,12 +1,14 @@
-# Calculator requirements — V1 simple, V2 scientific
+# .NET 10 calculator requirements — V1 simple, V2 scientific
 
 ## Scope and chosen defaults
 
-Build one browser calculator in two increments. For a new repository, use React + TypeScript + Vite, Vitest, and React Testing Library; reuse existing repository conventions if present. The calculation engine is independent of React/DOM and testable as pure functions. No backend, login, database, or cloud deployment.
+Build one browser calculator in two increments. For a new repository, use the .NET 10 SDK, a standalone Blazor WebAssembly app, a pure C# calculation-engine class library, xUnit, and bUnit; reuse existing repository conventions if present. The calculation engine is independent of Blazor and the browser DOM and testable as ordinary C# code. The application build and test workflow must not require Node.js, npm, or another JavaScript package manager. No backend, login, database, or cloud deployment.
+
+Use SDK-style projects and centralize shared build settings when the repository conventions support it. Reference the engine from the Blazor app and both test projects. Use NuGet only for test or framework packages that the .NET SDK does not provide. The expected validation surface is `dotnet restore`, `dotnet build`, and `dotnet test`; use `dotnet format --verify-no-changes` only when formatting enforcement is configured. The standalone app must be runnable locally with the repository's documented `dotnet run` command.
 
 This document is the source of truth for backlog creation. Story IDs below are **requirement identifiers, not Azure DevOps item IDs**. Actual numeric work-item IDs and URLs must come from the server and be saved to [work-item-map.json](work-item-map.json). Priority P1 means first within its version; P2 means next. Do not infer numeric priority fields or estimates from these labels.
 
-Stable demo key: `copilot-calculator-demo`.
+Stable demo key: `copilot-calculator-dotnet-demo`.
 
 ## Compact backlog
 
@@ -31,7 +33,7 @@ A version parent summarizes its child scope; it is not another item for implemen
 - **V1 precedence:** unary signs, then `*` and `/`, then `+` and `-`. Binary operations of equal precedence associate left-to-right. Thus `2+3*4 = 14`, `8/4*2 = 4`, `-2*3 = -6`. No parentheses or scientific functions in V1.
 - **Equals:** evaluate the complete visible expression, not a hidden immediate-execution accumulator. After a successful equals, a digit/decimal starts a new expression; a binary operator continues from the internal, unrounded result. Repeated equals leaves the same result; it does not repeat the last operation. Backspace after equals returns to editing the prior expression, removes its last character, and clears the result state. Sign change after equals negates the result for continued calculation.
 - **Editing:** keypad and editable expression field stay synchronized. Backspace removes the character before the caret (or the selected text). Sign change in an editable expression toggles the leading unary minus of the numeric literal at the caret; when there is no number there, start a negative numeric literal at that position. In V2 it does not silently negate a whole compound expression: use `-(...)` explicitly. Clear resets expression, result, and error but preserves V2 mode/angle settings.
-- **Evaluation safety:** implement tokenization and parsing, not JavaScript evaluation. Never use `eval`, `new Function`, or code execution based on input. Expressions are data, not program instructions.
+- **Evaluation safety:** implement tokenization and parsing in the C# engine. Never use C# scripting, Roslyn dynamic compilation, reflection-based invocation, `DataTable.Compute`, JavaScript interop, or any other code-execution mechanism to evaluate input. Expressions are data, not program instructions.
 - **Bounds:** max 256 input characters, max 128 tokens, max parenthesis depth 16 in V2. Reject an edit that exceeds an input bound with a readable message and preserve the existing input. Return a recoverable error if parsing/evaluation exceeds a bound.
 - **Precision:** use full finite IEEE-754 double values internally. Format the display to at most 12 significant digits, trim unnecessary trailing fractional zeros, and show actual negative zero as `0`. Use scientific notation for nonzero magnitudes below `1e-6` or at least `1e12`. Never round intermediate results merely to match the display. Display-generated exponent notation need not be accepted as editable input; operator-continuation from a result uses its internal value, not reparsing its formatted text.
 - **Comparisons:** engine assertions pass if `abs(actual - expected) <= max(1e-10, 1e-12 * abs(expected))`. Use exact checks for error classifications, settings, and UI strings whose formatting is specified. Do not use loose equality or exact binary floating-point equality for ordinary decimal results.
@@ -52,7 +54,7 @@ A version parent summarizes its child scope; it is not another item for implemen
 - **V1-E2 (V1-R02):** Given arithmetic expressions, when evaluating `2+3*4`, `8/4*2`, `10-3-2`, and `8/-2`, then results are `14`, `4`, `5`, and `-4`. Given `2+3*4`, when equals is requested, then the whole expression is evaluated with precedence, not left-to-right immediate execution.
 - **V1-E3 (V1-R03):** Given `9/0` or `0/0`, when evaluated, then a division-by-zero error is returned. Given a subsequent valid `6/2`, then the result is `3`; no stale prior result is returned. Given unsupported `(2+3)`, `sin(30)`, `2pi`, or executable-looking text, when evaluated in V1, then it is rejected.
 - **V1-E4 (V1-R03):** Given `0.1+0.2`, when evaluated and formatted, then the display is `0.3`. Given `1/3`, then the display is `0.333333333333`. Given an overflowing multiplication or a bound violation, then a recoverable error is returned, never a non-finite success.
-- **V1-E5 (V1-R04):** Given the engine tests, when run without mounting React or a browser DOM, then parsing, evaluation, error classifications, and formatting can be tested. Given an input that would be JavaScript source, then the engine treats it as invalid data and does not execute it.
+- **V1-E5 (V1-R04):** Given the engine tests, when run without rendering Blazor components or mounting a browser DOM, then parsing, evaluation, error classifications, and formatting can be tested. Given input that resembles JavaScript, C#, or another executable language, then the engine treats it as invalid data and does not execute it.
 
 **Implementation boundaries:** Engine and format tests only; a minimal app scaffold may be needed in a fresh repository. Do not build all the UI or scientific functions under this story.
 
@@ -80,7 +82,7 @@ A version parent summarizes its child scope; it is not another item for implemen
 
 - **V1-Q1 (V1-R08):** Given calculator focus, when digits, `.`, `+`, `-`, `*`, and `/` are typed, then the same valid input is available as with the keypad. Enter or `=` evaluates, Escape clears, and Backspace edits. Outside the calculator, do not intercept shortcuts; do not suppress Tab navigation or browser shortcuts.
 - **V1-Q2 (V1-R09):** Given viewports 320 px, 768 px, and 1280 px wide, when the calculator is rendered, then controls and error text are usable without page-level horizontal overflow. Long expressions may scroll inside their field. Interactive controls have target sizes at least 44×44 CSS px; text contrast is at least 4.5:1 and visible focus remains present.
-- **V1-Q3 (V1-R10):** Given the V1 code, when the actual configured tests, type check, lint if configured, and build are run, then results are reported honestly and test names/map identify the V1 criteria they cover. A manual check documents keyboard and responsive behavior that automated tests do not establish.
+- **V1-Q3 (V1-R10):** Given the V1 code, when the actual configured `dotnet test`, `dotnet build`, and formatting check if configured are run, then results are reported honestly and test names/map identify the V1 criteria they cover. A manual check documents keyboard and responsive behavior that automated tests do not establish.
 
 **V1 exit:** All V1 stories' criteria are met, their validation is observed, and the README explains local start/test/build and the deliberate omissions. Report incomplete checks instead of marking the version done.
 
@@ -128,8 +130,8 @@ V2 extends the existing V1 engine and UI. Default mode on a fresh app load is **
 
 - **V2-F1 (V2-R07):** Given scientific mode, when evaluating `log10(100)`, `ln(e)`, and `exp(0)`, then results are `2`, `1`, and `1`. Logarithms require strictly positive real arguments; `log10(0)` and `ln(-1)` return domain errors. `exp(710)` returns an overflow error; finite underflow to zero is allowed and documented.
 - **V2-F2 (V2-R08):** Given postfix factorial, when evaluating `0!` and `5!`, then results are `1` and `120`. Accept non-negative integers `0..170` only; `170!` is finite, `171!` returns a range error, and `(-1)!` or `2.5!` return domain errors. Due to precedence, use `(-1)!` to test negative input: `-1!` means `-(1!)`. Repeated factorial `5!!` is unsupported and rejected, not double-factorial notation.
-- **V2-F3 (V2-R09):** Given constants entered using controls or explicit text, when evaluating `2*pi` and `e`, then full internal `Math.PI`/`Math.E` equivalent values are used. `pi`/`e` remain identifiable in input; `2pi` is rejected. `pi` displays `3.14159265359` using the shared 12-significant-digit rule.
-- **V2-F4 (V2-R10):** Given the final V2 app, when the full V1 and V2 engine/UI suites, available type/lint checks, and build are actually run, then results are reported by command with pass/fail/not-run and criterion coverage. Document mode/angle defaults, grammar, domains, precision, and deliberate omissions. A failed or unrun regression prevents a verified-complete claim.
+- **V2-F3 (V2-R09):** Given constants entered using controls or explicit text, when evaluating `2*pi` and `e`, then full internal `System.Math.PI`/`System.Math.E` values are used. `pi`/`e` remain identifiable in input; `2pi` is rejected. `pi` displays `3.14159265359` using the shared 12-significant-digit rule.
+- **V2-F4 (V2-R10):** Given the final V2 app, when the full V1 and V2 engine/component suites, the configured .NET formatting check if any, and the build are actually run, then results are reported by command with pass/fail/not-run and criterion coverage. Document mode/angle defaults, grammar, domains, precision, and deliberate omissions. A failed or unrun regression prevents a verified-complete claim.
 
 **V2 exit:** All V2 criteria and all V1 regressions are met. No rewrite, lost editing behavior, inaccessible scientific controls, silent domain coercion, or unsupported surprise features.
 
