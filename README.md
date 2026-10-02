@@ -2,7 +2,7 @@
 
 A presenter-ready demo kit: turn requirements into Azure DevOps Boards work items, then use those work items as the bounded specification for GitHub Copilot implementation.
 
-**This kit authors instructions, not a running app.** No Azure DevOps account was connected, no work items were created, and no application was implemented or tested while preparing it. The two real repository agent skills live in their own `SKILL.md` files. They require tools exposed by your Copilot client; a skill does not install tools or grant permissions.
+**This kit authors instructions, not a running app.** No Azure DevOps account was connected, no work items were created, and no application was implemented or tested while preparing it. The three real repository agent skills live in their own `SKILL.md` files. They require tools exposed by your Copilot client; a skill does not install tools or grant permissions.
 
 ## Start here
 
@@ -10,7 +10,7 @@ A presenter-ready demo kit: turn requirements into Azure DevOps Boards work item
 2. Read [calculator requirements](docs/calculator-requirements.md).
 3. Complete the setup checklist below.
 4. Open [copy/paste demo prompts](docs/demo-prompts.md) and run them in order in **VS Code, GitHub Copilot Chat, Agent mode**.
-5. Inspect [the integrated skill report](docs/skill-report.html) for authoring checks and the limits of the offline smoke tests. It is not a live Azure DevOps certification.
+5. Inspect [the historical skill report](docs/skill-report.html) for authoring checks on the original two skills and the limits of those offline smoke tests. It does not cover `ado-implement-work-item-with-pr` and is not a live Azure DevOps certification.
 
 ## Intended repository layout
 
@@ -21,7 +21,9 @@ A presenter-ready demo kit: turn requirements into Azure DevOps Boards work item
 │   └── skills/
 │       ├── ado-create-work-items/
 │       │   └── SKILL.md
-│       └── ado-implement-work-item/
+│       ├── ado-implement-work-item/
+│       │   └── SKILL.md
+│       └── ado-implement-work-item-with-pr/
 │           └── SKILL.md
 ├── .vscode/
 │   └── mcp.json
@@ -32,7 +34,7 @@ A presenter-ready demo kit: turn requirements into Azure DevOps Boards work item
     └── skill-report.html
 ```
 
-Application files such as `package.json`, `src/`, and tests are created later by Copilot during the demo, not supplied by this kit. Copy the repository skills into this exact layout; do not flatten or rename either `SKILL.md`.
+Application files such as `package.json`, `src/`, and tests are created later by Copilot during the demo, not supplied by this kit. Copy the repository skills into this exact layout; do not flatten or rename any `SKILL.md`.
 
 ## Chosen demo defaults
 
@@ -53,10 +55,12 @@ Calculator requirements (version + stable requirement IDs + acceptance criteria)
     → Azure DevOps MCP: metadata/query → approved create/link → read-back
     → Azure DevOps Boards: version parent → implementable stories
     → docs/work-item-map.json: actual returned IDs and URLs
-    → ado-implement-work-item skill: exact selected item + acceptance criteria
+    → ado-implement-work-item skill: local-only implementation and validation
+      OR ado-implement-work-item-with-pr: one-item branch and approved delivery
     → Copilot file/terminal tools: isolated calculation engine + UI + tests
     → observed validation results and human review
-    → optional, separately authorized Azure DevOps comment/state transition
+    → optional local-only writeback, or approved commit → push → GitHub PR
+    → delivery evidence comment + revision-safe Azure DevOps transition
 ```
 
 The Azure DevOps MCP server supplies work-item context and Boards actions. Copilot's repository and terminal tools do the programming. Neither the MCP server nor a `SKILL.md` is a magic code-generation API.
@@ -64,7 +68,8 @@ The Azure DevOps MCP server supplies work-item context and Boards actions. Copil
 ## Setup checklist
 
 - [ ] A local Git repository is open at its root in VS Code, with a clean or clearly understood working tree. Use a disposable demo branch; do not overwrite unrelated work.
-- [ ] GitHub Copilot is available to your account and VS Code offers Agent mode and repository agent skills. Verify that both skill descriptions are visible/discoverable in your client. Discovery is based on descriptions and prompts; filename placement alone is not proof it triggered.
+- [ ] GitHub Copilot is available to your account and VS Code offers Agent mode and repository agent skills. Verify that all three skill descriptions are visible/discoverable in your client. Discovery is based on descriptions and prompts; filename placement alone is not proof it triggered.
+- [ ] For `ado-implement-work-item-with-pr`, a GitHub remote and authenticated non-interactive PR tooling (normally GitHub CLI) are ready. Configure the Azure Boards GitHub repository integration if `AB#<id>` commit/PR references must become live work-item links; reference syntax alone does not configure or prove that integration.
 - [ ] You have an Azure DevOps organization and project, project membership, and permission to query, create, edit, and link the intended work items.
 - [ ] For the primary remote MCP setup, the organization is Microsoft Entra-backed. Standalone Microsoft Account-backed organizations are not supported by the documented remote server.
 - [ ] Replace `<ADO_ORGANIZATION>` in [.vscode/mcp.json](.vscode/mcp.json) with the organization slug, not a project name or full URL. Replace `<ADO_PROJECT>` in prompts with your actual project name.
@@ -148,10 +153,10 @@ The traceability map starts deliberately empty. IDs and URLs appear only after s
 
 **Short live flow (roughly 12–20 minutes; generation may take longer):**
 
-1. **1–2 min:** show requirements and the two `SKILL.md` descriptions. Explain read tools versus write tools.
+1. **1–2 min:** show requirements and the three `SKILL.md` descriptions. Explain local-only implementation versus approval-gated PR delivery, and read tools versus write tools.
 2. **2–3 min:** preflight, then V1 preview. Show version parent, three stories, acceptance criteria, and repeatability keys before approving anything.
 3. **2–3 min:** create V1, then show actual Boards items and the populated map.
-4. **4–8 min:** implement the first actual V1 story, inspect tests and diff, then continue the remaining V1 stories if time allows. The first story is engine-only; a working UI requires the other V1 stories.
+4. **4–8 min:** implement the first actual V1 story locally, or use the delivery skill to preview its branch/commit/PR/work-item mutations before approval. Inspect tests and diff. The first story is engine-only; a working UI requires the other V1 stories.
 5. **2–3 min:** show V2 preview/create and a bounded V2 implementation request. Run real V1 regression checks before claiming V2 success.
 6. **1 min:** repeat the V1 create prompt to demonstrate reuse, or show the separate optional writeback approval.
 
@@ -163,11 +168,12 @@ For a reliably short talk, implement just one story live and explain that the re
 - Engine tests, UI tests, type checks, lint (if configured), and production build have actually run, or are explicitly reported as not run with reasons.
 - Keyboard behavior and accessibility checks include manual inspection; automated tests alone are not a blanket accessibility guarantee.
 - V2 changes preserve the V1 suite. Unselected work items remain out of scope.
-- Diff is reviewed. No automatic commit, push, pull request, Azure DevOps state change, or completion claim.
+- With `ado-implement-work-item`, the reviewed diff remains local: no automatic commit, push, pull request, Azure DevOps state change, or completion claim.
+- With `ado-implement-work-item-with-pr`, required checks pass before delivery; the approved branch, `AB#` commit, push, PR, factual comment, and revision-safe supported transition are read back and reported. The skill does not merge the PR or claim linkage that was not observed.
 
 ## Offline validation limits
 
-The delivered skill report covers static authoring checks and isolated smoke tests of routing, boundary handling, and safe blocking when inputs/tools are unavailable. It does **not** prove successful authentication, project metadata discovery, work-item CRUD/linking, Copilot client discovery, code generation, or calculator execution in your environment. The numeric writing-quality rubric is advisory and not a GitHub/Microsoft certification. Rehearse the live path with your actual project and client.
+The delivered skill report covers the original two skills' static authoring checks and isolated smoke tests of routing, boundary handling, and safe blocking when inputs/tools are unavailable. It predates and does **not** validate `ado-implement-work-item-with-pr`. It also does not prove successful authentication, project metadata discovery, work-item CRUD/linking, Git/GitHub delivery, Copilot client discovery, code generation, or calculator execution in your environment. The numeric writing-quality rubric is advisory and not a GitHub/Microsoft certification. Rehearse the live path with your actual project and client.
 
 ## Official references
 
