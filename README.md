@@ -56,10 +56,10 @@ Calculator requirements (version + stable requirement IDs + acceptance criteria)
     → Azure DevOps Boards: version parent → implementable stories
     → docs/work-item-map.json: actual returned IDs and URLs
     → ado-implement-work-item skill: local-only implementation and validation
-      OR ado-implement-work-item-with-pr: one-item branch and approved delivery
+      OR ado-implement-work-item-with-pr: plan-first, one-item PR delivery
     → Copilot file/terminal tools: isolated calculation engine + UI + tests
     → observed validation results and human review
-    → optional local-only writeback, or approved commit → push → GitHub PR
+    → optional local-only writeback, or plan-approved commit → push → GitHub PR
     → delivery evidence comment + revision-safe Azure DevOps transition
 ```
 
@@ -68,7 +68,7 @@ The Azure DevOps MCP server supplies work-item context and Boards actions. Copil
 ## Setup checklist
 
 - [ ] A local Git repository is open at its root in VS Code, with a clean or clearly understood working tree. Use a disposable demo branch; do not overwrite unrelated work.
-- [ ] GitHub Copilot is available to your account and VS Code offers Agent mode and repository agent skills. Verify that all three skill descriptions are visible/discoverable in your client. Discovery is based on descriptions and prompts; filename placement alone is not proof it triggered.
+- [ ] GitHub Copilot is available to your account and VS Code offers Agent mode, native Plan mode with `exit_plan_mode`, and repository agent skills. Verify that all three skill descriptions are visible/discoverable in your client. Discovery is based on descriptions and prompts; filename placement alone is not proof it triggered. If Plan mode is unavailable, use `ado-implement-work-item` for local-only implementation; ordinary chat approval is not a fallback for PR delivery.
 - [ ] For `ado-implement-work-item-with-pr`, a GitHub remote and authenticated non-interactive PR tooling (normally GitHub CLI) are ready. Configure the Azure Boards GitHub repository integration if `AB#<id>` commit/PR references must become live work-item links; reference syntax alone does not configure or prove that integration.
 - [ ] You have an Azure DevOps organization and project, project membership, and permission to query, create, edit, and link the intended work items.
 - [ ] For the primary remote MCP setup, the organization is Microsoft Entra-backed. Standalone Microsoft Account-backed organizations are not supported by the documented remote server.
@@ -153,10 +153,10 @@ The traceability map starts deliberately empty. IDs and URLs appear only after s
 
 **Short live flow (roughly 12–20 minutes; generation may take longer):**
 
-1. **1–2 min:** show requirements and the three `SKILL.md` descriptions. Explain local-only implementation versus approval-gated PR delivery, and read tools versus write tools.
+1. **1–2 min:** show requirements and the three `SKILL.md` descriptions. Explain local-only implementation versus plan-approved PR delivery, and read tools versus write tools.
 2. **2–3 min:** preflight, then V1 preview. Show version parent, three stories, acceptance criteria, and repeatability keys before approving anything.
 3. **2–3 min:** create V1, then show actual Boards items and the populated map.
-4. **4–8 min:** implement the first actual V1 story locally, or use the delivery skill to preview its branch/commit/PR/work-item mutations before approval. Inspect tests and diff. The first story is engine-only; a working UI requires the other V1 stories.
+4. **4–8 min:** implement the first actual V1 story locally, or use the delivery skill to review its native plan and choose interactive or autopilot execution. Inspect tests and diff. The first story is engine-only; a working UI requires the other V1 stories.
 5. **2–3 min:** show V2 preview/create and a bounded V2 implementation request. Run real V1 regression checks before claiming V2 success.
 6. **1 min:** repeat the V1 create prompt to demonstrate reuse, or show the separate optional writeback approval.
 
@@ -169,7 +169,7 @@ For a reliably short talk, implement just one story live and explain that the re
 - Keyboard behavior and accessibility checks include manual inspection; automated tests alone are not a blanket accessibility guarantee.
 - V2 changes preserve the V1 suite. Unselected work items remain out of scope.
 - With `ado-implement-work-item`, the reviewed diff remains local: no automatic commit, push, pull request, Azure DevOps state change, or completion claim.
-- With `ado-implement-work-item-with-pr`, required checks pass before delivery; the approved branch, `AB#` commit, push, PR, factual comment, and revision-safe supported transition are read back and reported. The skill does not merge the PR or claim linkage that was not observed.
+- With `ado-implement-work-item-with-pr`, the native plan is reviewed before interactive or autopilot execution, and required checks pass before delivery; the plan-approved branch, `AB#` commit, push, PR, factual comment, and revision-safe supported transition are read back and reported. The skill does not merge the PR or claim linkage that was not observed.
 
 ## Offline validation limits
 

@@ -101,7 +101,7 @@ commit, push, deploy, or open a PR.
 
 ## 4A. Deliver one actual story on a feature branch and PR
 
-Use this instead of prompt 4 when the selected story should be committed, pushed, opened as a GitHub pull request, and updated in Azure DevOps. Use a disposable repository/project during rehearsal. The first run must stop after the preview; approval is a separate user turn.
+Use this instead of prompt 4 when the selected story should be committed, pushed, opened as a GitHub pull request, and updated in Azure DevOps. Use a disposable repository/project during rehearsal. Switch the chat to native Plan mode before pasting the prompt. The skill plans first, lets you review or change the plan, and then offers interactive or autopilot execution. If the client does not provide Plan mode and `exit_plan_mode`, use `ado-implement-work-item` for local-only implementation instead; do not use ordinary chat approval for delivery writes.
 
 ```text
 Use ado-implement-work-item-with-pr for exactly one Azure DevOps work item.
@@ -116,39 +116,37 @@ instructions, status, current/default base branch, GitHub remote, existing
 local/remote branches and PRs, Git author configuration, and available
 non-interactive GitHub PR capability. Require a clean starting checkout.
 
-Prepare one delivery preview for feature/<WORK_ITEM_ID>-<TITLE_SLUG>. Include
-the bounded implementation/tests, actual validation commands, exact commit
-subject containing AB#<WORK_ITEM_ID>, PR base/head/title/body outline, factual
-Azure DevOps comment template with bounded placeholders for the read-back
-branch/commit/PR and observed test evidence, and one exact review/resolved-like
-target state verified as supported by live metadata.
+Enter plan mode and write one complete delivery plan for
+feature/<WORK_ITEM_ID>-<TITLE_SLUG>. Prompt me for any unresolved material
+implementation or delivery choice. Include the bounded file/component changes,
+criterion-mapped tests, actual validation commands, exact commit subject
+containing AB#<WORK_ITEM_ID>, PR base/head/title/body outline, factual Azure
+DevOps comment template with bounded placeholders for the read-back
+branch/commit/PR and observed test evidence, and one exact
+review/resolved-like target state verified as supported by live metadata.
 Explain that AB# traceability requires configured Azure Boards GitHub
 integration and is not proven by syntax alone.
 
 Do not create or switch branches, edit files, stage, commit, push, create a PR,
-comment, or transition state yet. Wait for my explicit approval of the complete
-preview. After approval, implement only this item and run all required checks.
-If any required check fails or remains unverified, stop before commit and all
-external writes. Otherwise stage only scoped files, commit with the approved
+comment, or transition state while planning. When the plan is complete, use
+the native plan approval menu so I can review or change it and choose
+interactive or autopilot execution. Treat approval of either execution option
+as authorization for all and only the mutations listed in the plan.
+
+After plan approval, implement only this item and run all required checks. If
+any required check fails or remains unverified, stop before commit and all
+external writes. Otherwise stage only scoped files, commit with the planned
 AB# subject, push without force, create and read back the GitHub PR, re-read
-the item, post/read back the approved factual comment, and perform/read back
-the approved revision-safe state transition. Never merge or delete the branch.
-Report partial failures and duplicate-safe resume instructions precisely.
+the item, post/read back the planned factual comment, and perform/read back
+the planned revision-safe state transition. Never merge or delete the branch.
+If any material plan detail changes, update the plan and request native plan
+approval again. Report partial failures and duplicate-safe resume instructions
+precisely.
 ```
 
-After reviewing the preview, approve only if every named mutation is correct:
+Review or edit the generated plan, then choose interactive execution or autopilot from the native approval menu. No separate approval prompt is needed.
 
-```text
-I explicitly approve the complete delivery preview for work item
-<WORK_ITEM_ID>: the named feature branch, scoped implementation, exact AB#
-commit subject, push and GitHub PR, Azure DevOps comment template with only
-the previewed artifact/evidence substitutions, and exact revision-safe state
-transition. Proceed only while the verified scope, base, remote, current item
-revision/state, and required validation remain valid. Stop and request new
-approval for any material change.
-```
-
-**Show:** the approval boundary first, then actual test evidence, scoped staged diff, commit SHA, canonical PR URL, comment read-back, and final item revision/state. A PR is not a merge, and `AB#` text is not proof of a configured link.
+**Show:** the reviewed plan and native execution choice first, then actual test evidence, scoped staged diff, commit SHA, canonical PR URL, comment read-back, and final item revision/state. A PR is not a merge, and `AB#` text is not proof of a configured link.
 
 ## 5. Complete remaining V1 stories as a bounded batch
 
